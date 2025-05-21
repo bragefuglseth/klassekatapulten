@@ -152,6 +152,8 @@
         }, 0); 
     }
 
+    $: studentBenchBalance = group.layout.flat().reduce((partialSum, a) => partialSum += a) - group.members.length;
+
     let lastGeneratedString = new Date(group.lastGenerated).toLocaleDateString();
 </script>
 
@@ -182,7 +184,8 @@
 
     p {
         color: #444;
-        line-height: 1.25;
+        line-height: 1.5;
+        margin: 0.5em 0;
     }
 
     .flat {
@@ -248,18 +251,24 @@
         align-items: center;
     }
 
+    .class-header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+    }
+
     .class-header {
         display: flex;
         align-items: baseline;
         gap: 0.5ch;
     }
 
-    .class-header > input {
+    .class-header input {
         border: transparent;
         border-bottom: 2px dotted silver;
         width: 12ch;
         font-size: 1.5rem;
-        padding: 0.1em 0.4em;
+        padding: 0.1em 0.2em;
     }
 
     .member-container {
@@ -294,13 +303,13 @@
 
     .seating-container {
         display: flex;
-        flex-direction: row;
+        flex-direction: row-reverse;
         gap: 10px;
     }
 
     .seating-row {
         display: flex;
-        flex-direction: column;
+        flex-direction: column-reverse;
         gap: 10px;
         align-items: center;
     }
@@ -323,6 +332,15 @@
         max-height: 3rem;
         width: 3rem;
         max-width: 3rem;
+    }
+    .board {
+        border: 1px solid silver;
+        padding: 0.2em 1em;
+        width: 20ch;
+        text-align: center;
+        border-radius: 10px;
+        margin-top: 0.8rem;
+        align-self: center;
     }
     .bench.disabled {
         background-color: transparent;
@@ -383,10 +401,20 @@
 
     .seating-wrapper-wrapper {
         margin: 2em 2em;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .gap {
+        display: flex;
+        gap: 0.5rem;
     }
 
     .seating-wrapper {
         margin-bottom: 1em;
+        display: flex;
+        flex-direction: column;
     }
 
     .legal {
@@ -396,8 +424,8 @@
         margin-top: 2.5rem;
     }
 
-    .noprint {
-        visibility: visible;
+    .onlyprint {
+        display: none;
     }
 
     @media print {
@@ -406,7 +434,11 @@
         }
 
         .noprint {
-            visibility: hidden;
+            display: none;
+        }
+
+        .onlyprint {
+            display: initial;
         }
 
         .seating-wrapper-wrapper {
@@ -417,19 +449,26 @@
     }
 </style>
 
+<input type="file" id="file-input" bind:files={files} />
 <div id="wrapper">
     {#if mode == "setup"}
         <div class="setup-container">
             <header class="header">
                 <h1><img height="150" src="/logo.svg"></h1>
-                <input type="file" id="file-input" bind:files={files} />
-                <label class="flat" for="file-input">🗁</label>
-                <button class="flat" onclick={saveFile}>🖫</button>
+                
+                <div class="horizontal-group">
+                    <label class="flat" for="file-input" title="Åpne fil"><img height="24" src="/mappe.svg"></label>
+                    <button class="flat" title="Last ned fil" onclick={saveFile}><img height="24" src="/lagre.svg"></button>
+                </div>
             </header>
-            <p>Det har aldri vært enklere å lage klassekart. Legg inn elever, konfigurer klasserommet, og få et fiks ferdig oppsett! Bruk det som det er, eller gjør endringer etter behov. Du kan laste ned klassekartfilen til senere bruk. Klassekatapulten vil da huske de siste oppsettene og forsøke å unngå at to elever blir satt sammen flere ganger.</p>
-            <div class="class-header">
-                <h2>Klasse</h2>
-                <input bind:value={group.name}>
+            <p>Det har aldri vært enklere å lage klassekart. Legg inn alle elevene i klassen din, angi bordoppstillingen i rommet, og la Klassekatapulten generere et klassekart for deg. Bruk det som det er, eller gjør endringer etter behov.</p>
+            <p>Ved å trykke på nedlastingsknappen oppe til høyre, kan du laste ned en liten datafil med informasjon om klassen og bordoppstillingen, som kan åpnes igjen i Klassekatapulten ved en senere anledning. Denne filen «husker» også de siste klassekartene som har blitt generert, og Klassekatapulten bruker dette til å unngå at elever settes sammen flere ganger rett etter hverandre.</p>
+            <div class="class-header-container">
+                <div class="class-header">
+                    <h2>Klasse</h2>
+                    <input bind:value={group.name}>
+                </div>
+                <p>{group.members.length} elever</p>
             </div>
             <ul class="member-container">
                 {#each group.members as member, i}
@@ -440,9 +479,21 @@
                 {/each}
             </ul>
             <button onclick={addMember} class="pill">+ Ny elev</button>
-            <h2>Oppsett</h2>
+            <div class="class-header-container">
+                <h2>Plasser</h2>
+                <p>
+                    {#if studentBenchBalance > 0}
+                        {studentBenchBalance} til overs
+                    {:else if studentBenchBalance < 0}
+                        {studentBenchBalance * -1} for lite
+                    {:else}
+                        Akkurat nok
+                    {/if}
+                </p>
+            </div>
             <div class="seating-container-outer">
-                <div class="seating-container">
+                <div class="horizontal-group">
+                    <div class="seating-container">
                     {#each group.layout as col, i}
                         <div class="seating-row">
                             {#each col as bench, j}
@@ -462,6 +513,7 @@
                             {/each}
                         </div>
                     {/each}
+                    </div>
                     <div class="vertical-group">
                         <button class="circle" onclick={addLayoutColumn}>+</button>
                         <button class="circle" onclick={removeLayoutColumn} disabled={group.layout.length <= 1}>-</button>
@@ -471,6 +523,7 @@
                     <button class="circle" onclick={addLayoutRow}>+</button>
                     <button class="circle" onclick={removeLayoutRow} disabled={group.layout[0].length <= 1}>-</button>
                 </div>
+                <div class="board">Tavle</div>
             </div>
             <button class="pill suggested" onclick={() => mode = "tableMap"}>Klassekart</button>
 
@@ -478,19 +531,21 @@
         </div>
     {:else if mode == "tableMap"}
         <div class="seating-wrapper-wrapper">
-            <button class="noprint flat" onclick={() => mode = "setup"}>⭠ Tilbake</button>
+            <button class="noprint flat" onclick={() => mode = "setup"} style="display: flex; align-items: center; gap: 0.5ch"><img src="/tilbake.svg" alt="Tilbakepil" height="24"> Tilbake</button>
             <div class="seating-wrapper">
-                <h2>Klassekart for {group.name}</h2>
-                <p>Oppdatert {lastGeneratedString}</p>
+                <div class="class-header-container">
+                    <h2>Klassekart for {group.name}</h2>
+                    <p>Oppdatert {lastGeneratedString}</p>
+                </div>
                 <div class="seating-container">
-                    {#each group.seating as row}
+                    {#each group.seating as row, i}
                         <div class="seating-row">
-                            {#each row as bench}
+                            {#each row as bench, j}
                                 {#if bench.length > 0}
                                 <div class="bench">
-                                    {#each bench as name}
+                                    {#each bench as name, k}
                                         <div class="bench-inner">
-                                            <div contenteditable="true" spellcheck="false" class="bench-input" >{name}</div>
+                                            <div contenteditable="true" spellcheck="false" class="bench-input" bind:textContent={group.seating[i][j][k]}></div>
                                         </div>
                                     {/each}
                                 </div>
@@ -501,8 +556,12 @@
                         </div>
                     {/each}
                 </div>
+                <div class="board">Tavle</div>
             </div>
-            <div class="horizontal-group">
+            <p style="max-width: 60ch;" class="noprint">Ikke helt det du så for deg? Trykk på «Generer»-knappen for å oppdatere klassekartet, eller trykk på navnene for å endre dem og bytte om på elever.</p>
+            <p style="max-width: 60ch;" class="noprint">Når du er ferdig, kan du skrive ut klassekartet og gå tilbake til startsiden og laste ned en fil som kan importeres i Klassekatapulten senere.</p>
+            <p class="onlyprint legal">Laget med Klassekatapulten — klassekart.bragefuglseth.no</p>
+            <div class="gap">
                 <button type="button" class="noprint pill suggested" onclick={generateSeating}>Generer</button>
                 <button type="button" class="noprint pill" onclick={() => window.print()}>Skriv ut</button>
             </div>
