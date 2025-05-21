@@ -480,7 +480,7 @@
         <div class="seating-wrapper-wrapper">
             <button class="noprint flat" onclick={() => mode = "setup"}>⭠ Tilbake</button>
             <div class="seating-wrapper">
-                <h2>Klassekart</h2>
+                <h2>Klassekart for {group.name}</h2>
                 <p>Oppdatert {lastGeneratedString}</p>
                 <div class="seating-container">
                     {#each group.seating as row}
