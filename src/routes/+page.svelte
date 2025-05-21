@@ -2,7 +2,7 @@
     let mode = "setup";
 
     let group = {
-        name: "",
+        name: "1A",
         members: [
             { name: "Ole", id: "1" },
             { name: "Dole", id: "2" },
@@ -143,7 +143,7 @@
         const a = document.createElement("a");
         const url = URL.createObjectURL(file);
         a.href = url;
-        a.download = group.name + "klassekart.json";
+        a.download = group.name + "-klassekart.json";
         document.body.appendChild(a);
         a.click();
         setTimeout(function() {
@@ -165,6 +165,14 @@
     }
     @supports (font-variation-settings: normal) {
         :root { font-family: InterVariable, sans-serif; }
+    }
+
+    button {
+        font-family: Inherit;
+    }
+
+    h2 {
+        font-size: 1.5rem;
     }
 
     :global(body) {
@@ -206,7 +214,7 @@
     }
 
     .suggested {
-        background-color: slateblue;
+        background-color: #b635b7;
         border: transparent;
         color: white;
     }
@@ -236,10 +244,25 @@
     .header {
         display: flex;
         justify-content: space-between;
+        align-items: center;
+    }
+
+    .class-header {
+        display: flex;
         align-items: baseline;
+        gap: 0.5ch;
+    }
+
+    .class-header > input {
+        border: transparent;
+        border-bottom: 2px dotted silver;
+        width: 12ch;
+        font-size: 1.5rem;
+        padding: 0.1em 0.4em;
     }
 
     .member-container {
+        margin-top: 0;
         list-style-type: none;
         padding-left: 0;
         background: whitesmoke;
@@ -287,24 +310,28 @@
         border: 1px solid silver;
     }
     :global(.bench-inner) {
-        height: 3rem;
-        width: 5rem;
+        height: 4rem;
+        width: 6rem;
         display: flex;
         justify-content: center;
         align-items: center;
         text-align: center;
-        padding: 0.5em;
     }
     :global(.bench-inner.setup) {
-        height: 2rem;
-        max-height: 2rem;
-        width: 2rem;
-        max-width: 2rem;
+        height: 3rem;
+        max-height: 3rem;
+        width: 3rem;
+        max-width: 3rem;
     }
     .bench.disabled {
         background-color: transparent;
         border: 1px solid lightgrey;
     }
+    .bench.invisible {
+        background-color: transparent;
+        border: 1px solid transparent;
+    }
+
     :global(.bench-inner:not(:last-child)) {
         border-right: 1px solid silver;
     }
@@ -348,16 +375,24 @@
         text-align: center;
         background: transparent;
         border: none;
+        overflow-x: auto;
+        max-height: 100%;
+        word-wrap: break-word;
     }
 
     .seating-wrapper-wrapper {
-        display: flex;
-        align-items: center;
-        flex-direction: column;
+        margin: 2em 2em;
     }
 
     .seating-wrapper {
         margin-bottom: 1em;
+    }
+
+    .legal {
+        color: #777;
+        font-size: 0.8rem;
+        text-align: center;
+        margin-top: 2.5rem;
     }
 
     .noprint {
@@ -372,6 +407,12 @@
         .noprint {
             visibility: hidden;
         }
+
+        .seating-wrapper-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
     }
 </style>
 
@@ -379,13 +420,16 @@
     {#if mode == "setup"}
         <div class="setup-container">
             <header class="header">
-                <h1>Klassekatapulten</h1>
+                <h1><img height="150" src="/logo.svg"></h1>
                 <input type="file" id="file-input" bind:files={files} />
                 <label class="flat" for="file-input">🗁</label>
                 <button class="flat" onclick={saveFile}>🖫</button>
             </header>
-            <p>Det har aldri vært enklere å lage klassekart. Legg inn elevene dine, konfigurer klasserommet, og få et fiks ferdig oppsett! Du kan laste ned klassekartfilen til senere bruk. Klassekatapulten vil da huske de siste oppsettene og forsøke å unngå at to elever blir satt sammen flere ganger.</p>
-            <h2>Elever</h2>
+            <p>Det har aldri vært enklere å lage klassekart. Legg inn elever, konfigurer klasserommet, og få et fiks ferdig oppsett! Bruk det som det er, eller gjør endringer etter behov. Du kan laste ned klassekartfilen til senere bruk. Klassekatapulten vil da huske de siste oppsettene og forsøke å unngå at to elever blir satt sammen flere ganger.</p>
+            <div class="class-header">
+                <h2>Klasse</h2>
+                <input bind:value={group.name}>
+            </div>
             <ul class="member-container">
                 {#each group.members as member, i}
                     <li class="member">
@@ -428,10 +472,12 @@
                 </div>
             </div>
             <button class="pill suggested" onclick={() => mode = "tableMap"}>Klassekart</button>
+
+            <p class="legal">© Brage Fuglseth Olsen. Avsluttende prosjekt i IT1 på Asker VGS, våren 2025. Klassekatapulten er lisensiert under <a href="https://www.gnu.org/licenses/gpl-3.0.html">GPLv3-lisensen</a>, og <a href="https://github.com/bragefuglseth/klassekatapulten">kildekoden</a> er åpent tilgjengelig.</p>
         </div>
     {:else if mode == "tableMap"}
-        <button class="noprint flat" onclick={() => mode = "setup"}>⭠ Tilbake</button>
         <div class="seating-wrapper-wrapper">
+            <button class="noprint flat" onclick={() => mode = "setup"}>⭠ Tilbake</button>
             <div class="seating-wrapper">
                 <h2>Klassekart</h2>
                 <p>Oppdatert {lastGeneratedString}</p>
@@ -439,19 +485,23 @@
                     {#each group.seating as row}
                         <div class="seating-row">
                             {#each row as bench}
+                                {#if bench.length > 0}
                                 <div class="bench">
                                     {#each bench as name}
                                         <div class="bench-inner">
-                                            <input class="bench-input" value="{name}">
+                                            <div contenteditable="true" spellcheck="false" class="bench-input" >{name}</div>
                                         </div>
                                     {/each}
                                 </div>
+                                {:else}
+                                <div class="bench invisible"><div class="bench-inner"></div></div>
+                                {/if}
                             {/each}
                         </div>
                     {/each}
                 </div>
             </div>
-            <div class="horizontal-container">
+            <div class="horizontal-group">
                 <button type="button" class="noprint pill suggested" onclick={generateSeating}>Generer</button>
                 <button type="button" class="noprint pill" onclick={() => window.print()}>Skriv ut</button>
             </div>
