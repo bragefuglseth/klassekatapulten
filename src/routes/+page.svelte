@@ -197,6 +197,12 @@
         transition: transform 200ms;
     }
 
+    .vertical-align {
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
+    }
+
     .flat:hover, button.circle:hover {
         opacity: 0.8;
         transform: scale(1.2);
@@ -531,7 +537,7 @@
         </div>
     {:else if mode == "tableMap"}
         <div class="seating-wrapper-wrapper">
-            <button class="noprint flat" onclick={() => mode = "setup"} style="display: flex; align-items: center; gap: 0.5ch"><img src="/tilbake.svg" alt="Tilbakepil" height="24"> Tilbake</button>
+            <button class="noprint flat vertical-align" onclick={() => mode = "setup"}><img class="noprint" src="/tilbake.svg" alt="Tilbakepil" height="24"> Tilbake</button>
             <div class="seating-wrapper">
                 <div class="class-header-container">
                     <h2>Klassekart for {group.name}</h2>
