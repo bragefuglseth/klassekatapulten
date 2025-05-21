@@ -168,7 +168,8 @@
     }
 
     button {
-        font-family: Inherit;
+        font-family: inherit;
+        color: inherit;
     }
 
     h2 {
