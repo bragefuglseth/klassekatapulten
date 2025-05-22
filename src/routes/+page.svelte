@@ -531,7 +531,7 @@
                 </div>
                 <div class="board">Tavle</div>
             </div>
-            <button class="pill suggested" onclick={() => mode = "tableMap"}>Klassekart</button>
+            <button class="pill suggested" onclick={() => { generateSeating(); mode = "tableMap"; }}>Lag klassekart</button>
 
             <p class="legal">© Brage Fuglseth Olsen. Avsluttende prosjekt i IT1 på Asker VGS, våren 2025. Klassekatapulten er lisensiert under <a href="https://www.gnu.org/licenses/gpl-3.0.html">GPLv3-lisensen</a>, og <a href="https://github.com/bragefuglseth/klassekatapulten">kildekoden</a> er åpent tilgjengelig.</p>
         </div>
@@ -565,7 +565,7 @@
                 <div class="board">Tavle</div>
             </div>
             <p style="max-width: 60ch;" class="noprint">Ikke helt det du så for deg? Trykk på «Generer»-knappen for å oppdatere klassekartet, eller trykk på navnene for å endre dem og bytte om på elever.</p>
-            <p style="max-width: 60ch;" class="noprint">Når du er ferdig, kan du skrive ut klassekartet og gå tilbake til startsiden og laste ned en fil som kan importeres i Klassekatapulten senere.</p>
+            <p style="max-width: 60ch;" class="noprint">Når du er ferdig, kan du ta skjermbilde eller skrive ut klassekartet. Ikke glem å gå tilbake til startsiden for å laste ned en fil som kan importeres til Klassekatapulten senere.</p>
             <p class="onlyprint legal">Laget med Klassekatapulten — klassekart.bragefuglseth.no</p>
             <div class="gap">
                 <button type="button" class="noprint pill suggested" onclick={generateSeating}>Generer</button>
