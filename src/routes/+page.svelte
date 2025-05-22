@@ -460,7 +460,7 @@
     {#if mode == "setup"}
         <div class="setup-container">
             <header class="header">
-                <h1><img height="150" src="/logo.svg"></h1>
+                <h1><img width="270" src="/logo.svg"></h1>
                 
                 <div class="horizontal-group">
                     <label class="flat" for="file-input" title="Åpne fil"><img height="24" src="/mappe.svg"></label>
