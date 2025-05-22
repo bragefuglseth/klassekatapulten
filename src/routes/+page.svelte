@@ -309,7 +309,7 @@
 
     .seating-container {
         display: flex;
-        flex-direction: row-reverse;
+        flex-direction: row;
         gap: 10px;
     }
 
