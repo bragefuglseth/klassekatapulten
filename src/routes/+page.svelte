@@ -460,7 +460,7 @@
     {#if mode == "setup"}
         <div class="setup-container">
             <header class="header">
-                <h1><img width="270" src="/logo.svg" alt="logo"></h1>
+                <h1><img width="270" src="/logo.svg" alt="klassekatapulten"></h1>
                 
                 <div class="horizontal-group">
                     <label class="flat" for="file-input" title="Åpne fil"><img alt="mappe" height="24" src="/mappe.svg"></label>
